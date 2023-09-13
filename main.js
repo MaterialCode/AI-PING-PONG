@@ -1,10 +1,9 @@
 /*created by prashant shukla, edited by Jay Pandya */
 
-
-rightWristX = 0
-rightWristY = 0
-rightWristScrore = 0
-
+rightWristX = 0;
+rightWristY = 0;
+rightWristScrore = 0;
+game_status = "";
 
 var paddle2 = 10,
   paddle1 = 10;
@@ -37,69 +36,76 @@ function setup() {
   video.size(700, 600);
   video.hide();
 
-  poseNet = ml5.poseNet(video, modelLoaded)
-  poseNet.on("pose", gotPoses)
+  poseNet = ml5.poseNet(video, modelLoaded);
+  poseNet.on("pose", gotPoses);
 }
 
 function gotPoses(results) {
   if (results.length > 0) {
-    console.log(results)
+    console.log(results);
     rightWristX = results[0].pose.rightWrist.x;
-		rightWristY = results[0].pose.rightWrist.y;
+    rightWristY = results[0].pose.rightWrist.y;
     rightWristScrore = results[0].pose.keypoints[10].score;
   }
 }
 
+function startGame() {
+  game_status = "start";
+  document.getElementById("status").innerHTML = "Game is loaded";
+}
+
 function modelLoaded() {
-  console.log("Model Loaded!")
+  console.log("Model Loaded!");
 }
 
 function draw() {
-  background(0);
+  if (game_status == "start") {
+    background(0);
 
-  image(video, 0, 0, 700, 600);
-  
-  fill("black");
-  stroke("black");
-  rect(680, 0, 20, 700);
+    image(video, 0, 0, 700, 600);
 
-  fill("black");
-  stroke("black");
-  rect(0, 0, 20, 700);
+    fill("black");
+    stroke("black");
+    rect(680, 0, 20, 700);
 
-  if (rightWristScrore > 0.2) {
-    fill("#FF0000")
-    stroke("#FF0000")
-    circle(rightWristX, rightWristY, 30)
+    fill("black");
+    stroke("black");
+    rect(0, 0, 20, 700);
+
+    if (rightWristScrore > 0.2) {
+      fill("#FF0000");
+      stroke("#FF0000");
+      circle(rightWristX, rightWristY, 30);
+    }
+
+    //funtion paddleInCanvas call
+    paddleInCanvas();
+
+    //left paddle
+    fill(250, 0, 0);
+    stroke(0, 0, 250);
+    strokeWeight(0.5);
+    paddle1Y = mouseY;
+    rect(paddle1X, paddle1Y, paddle1, paddle1Height, 100);
+
+    //pc computer paddle
+    fill("#FFA500");
+    stroke("#FFA500");
+    var paddle2y = ball.y - paddle2Height / 2;
+    rect(paddle2Y, paddle2y, paddle2, paddle2Height, 100);
+
+    //function midline call
+    midline();
+
+    //funtion drawScore call
+    drawScore();
+
+    //function models call
+    models();
+
+    //function move call which in very important
+    move();
   }
-
-  //funtion paddleInCanvas call
-  paddleInCanvas();
-
-  //left paddle
-  fill(250, 0, 0);
-  stroke(0, 0, 250);
-  strokeWeight(0.5);
-  paddle1Y = mouseY;
-  rect(paddle1X, paddle1Y, paddle1, paddle1Height, 100);
-
-  //pc computer paddle
-  fill("#FFA500");
-  stroke("#FFA500");
-  var paddle2y = ball.y - paddle2Height / 2;
-  rect(paddle2Y, paddle2y, paddle2, paddle2Height, 100);
-
-  //function midline call
-  midline();
-
-  //funtion drawScore call
-  drawScore();
-
-  //function models call
-  models();
-
-  //function move call which in very important
-  move();
 }
 
 //function reset when ball does notcame in the contact of padde
